@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  # main のブランチ保護の必須チェック。ファクトリーの工程内テストと同じ pnpm run check を回す
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run check
+      # ステージングのイメージがビルドできることも確かめる（ビルドの失敗をマージの前に見つける）
+      - run: docker build -t factory-sandbox:ci .
