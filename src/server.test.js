@@ -22,10 +22,12 @@ test("/healthz は 200 と status: ok を返す", async () => {
   assert.deepEqual(await res.json(), { status: "ok" });
 });
 
-test("/ は HTML を返す", async () => {
+test("/ は README.md の本文を HTML エスケープして返す", async () => {
   const res = await fetch(`${base}/`);
+  const body = await res.text();
   assert.equal(res.status, 200);
-  assert.match(await res.text(), /factory-sandbox/);
+  assert.match(body, /<pre>/);
+  assert.match(body, /# factory-sandbox/);
 });
 
 test("知らないパスは 404", async () => {

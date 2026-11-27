@@ -16,3 +16,17 @@ export function countWords(input) {
   const normalized = normalizeSpaces(input);
   return normalized === "" ? 0 : normalized.split(" ").length;
 }
+
+/**
+ * HTML 特殊文字をエスケープする。
+ * @param {string} input
+ * @returns {string}
+ */
+export function escapeHtml(input) {
+  return input
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
