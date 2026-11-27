@@ -1,5 +1,6 @@
 import { createServer } from "node:http";
 import { pathToFileURL } from "node:url";
+import { countWords } from "./text.js";
 
 /**
  * ステージングで動くデモアプリの HTTP サーバーを作る（待ち受けは呼び出し側）。
@@ -13,12 +14,26 @@ export function createApp() {
       res.end("method not allowed\n");
       return;
     }
-    if (req.url === "/healthz") {
+
+    const url = new URL(req.url ?? "", "http://localhost");
+
+    if (url.pathname === "/healthz") {
       res.writeHead(200, { "content-type": "application/json" });
       res.end(JSON.stringify({ status: "ok" }));
       return;
     }
-    if (req.url === "/") {
+    if (url.pathname === "/api/words") {
+      const text = url.searchParams.get("text");
+      if (text === null) {
+        res.writeHead(400, { "content-type": "application/json" });
+        res.end(JSON.stringify({ error: "text is required" }));
+        return;
+      }
+      res.writeHead(200, { "content-type": "application/json" });
+      res.end(JSON.stringify({ text, words: countWords(text) }));
+      return;
+    }
+    if (url.pathname === "/") {
       res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
       res.end(
         '<!doctype html><html lang="ja"><meta charset="utf-8"><title>factory-sandbox</title>' +
