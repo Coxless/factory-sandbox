@@ -14,5 +14,8 @@ export function normalizeSpaces(input) {
  */
 export function countWords(input) {
   const normalized = normalizeSpaces(input);
-  return normalized === "" ? 0 : normalized.split(" ").length;
+  if (normalized === "") {
+    return 0;
+  }
+  return normalized.split(" ").filter((token) => /[\p{L}\p{N}]/u.test(token)).length;
 }
