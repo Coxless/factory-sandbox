@@ -32,3 +32,23 @@ test("知らないパスは 404", async () => {
   const res = await fetch(`${base}/nope`);
   assert.equal(res.status, 404);
 });
+
+test("GET /api/words?text=hello%20world は単語数を返す", async () => {
+  const res = await fetch(`${base}/api/words?text=hello%20world`);
+  assert.equal(res.status, 200);
+  assert.equal(res.headers.get("content-type"), "application/json");
+  assert.deepEqual(await res.json(), { text: "hello world", words: 2 });
+});
+
+test("GET /api/words?text=日本語の全角スペース区切りも数える", async () => {
+  const res = await fetch(`${base}/api/words?text=${encodeURIComponent("こんにちは　世界")}`);
+  assert.equal(res.status, 200);
+  assert.deepEqual(await res.json(), { text: "こんにちは　世界", words: 2 });
+});
+
+test("GET /api/words で text がないときは 400", async () => {
+  const res = await fetch(`${base}/api/words`);
+  assert.equal(res.status, 400);
+  assert.equal(res.headers.get("content-type"), "application/json");
+  assert.deepEqual(await res.json(), { error: "text is required" });
+});
