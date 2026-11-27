@@ -3,6 +3,65 @@ import { pathToFileURL } from "node:url";
 import { countWords } from "./text.js";
 
 /**
+ * @typedef {import("node:http").IncomingMessage} IncomingMessage
+ * @typedef {import("node:http").ServerResponse} ServerResponse
+ */
+
+/**
+ * GET /healthz のハンドラ。
+ * @param {IncomingMessage} _req
+ * @param {ServerResponse} res
+ * @returns {void}
+ */
+function getHealthz(_req, res) {
+  res.writeHead(200, { "content-type": "application/json" });
+  res.end(JSON.stringify({ status: "ok" }));
+}
+
+/**
+ * GET /api/words のハンドラ。
+ * @param {IncomingMessage} req
+ * @param {ServerResponse} res
+ * @param {URL} url
+ * @returns {void}
+ */
+function getApiWords(req, res, url) {
+  const text = url.searchParams.get("text");
+  if (text === null) {
+    res.writeHead(400, { "content-type": "application/json" });
+    res.end(JSON.stringify({ error: "text is required" }));
+    return;
+  }
+  res.writeHead(200, { "content-type": "application/json" });
+  res.end(JSON.stringify({ text, words: countWords(text) }));
+}
+
+/**
+ * GET / のハンドラ。
+ * @param {IncomingMessage} _req
+ * @param {ServerResponse} res
+ * @returns {void}
+ */
+function getRoot(_req, res) {
+  res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+  res.end(
+    '<!doctype html><html lang="ja"><meta charset="utf-8"><title>factory-sandbox</title>' +
+      "<h1>factory-sandbox</h1><p>sakura-software-factory のステージングで動いています。</p></html>\n",
+  );
+}
+
+/**
+ * pathname からハンドラ関数を引くルート表。
+ * 各ハンドラは (req, res, url) を受け取る。
+ * @type {Map<string, (req: IncomingMessage, res: ServerResponse, url: URL) => void>}
+ */
+const routes = new Map([
+  ["/healthz", getHealthz],
+  ["/api/words", getApiWords],
+  ["/", getRoot],
+]);
+
+/**
  * ステージングで動くデモアプリの HTTP サーバーを作る（待ち受けは呼び出し側）。
  * `GET /healthz` は正常なら 200 を返す（ファクトリーのヘルスチェックが使う）。
  * @returns {import("node:http").Server}
@@ -16,31 +75,13 @@ export function createApp() {
     }
 
     const url = new URL(req.url ?? "", "http://localhost");
+    const handler = routes.get(url.pathname);
 
-    if (url.pathname === "/healthz") {
-      res.writeHead(200, { "content-type": "application/json" });
-      res.end(JSON.stringify({ status: "ok" }));
+    if (handler !== undefined) {
+      handler(req, res, url);
       return;
     }
-    if (url.pathname === "/api/words") {
-      const text = url.searchParams.get("text");
-      if (text === null) {
-        res.writeHead(400, { "content-type": "application/json" });
-        res.end(JSON.stringify({ error: "text is required" }));
-        return;
-      }
-      res.writeHead(200, { "content-type": "application/json" });
-      res.end(JSON.stringify({ text, words: countWords(text) }));
-      return;
-    }
-    if (url.pathname === "/") {
-      res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
-      res.end(
-        '<!doctype html><html lang="ja"><meta charset="utf-8"><title>factory-sandbox</title>' +
-          "<h1>factory-sandbox</h1><p>sakura-software-factory のステージングで動いています。</p></html>\n",
-      );
-      return;
-    }
+
     res.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
     res.end("not found\n");
   });
