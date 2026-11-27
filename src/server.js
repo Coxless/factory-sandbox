@@ -1,6 +1,7 @@
+import { readFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import { pathToFileURL } from "node:url";
-import { countWords } from "./text.js";
+import { countWords, escapeHtml } from "./text.js";
 
 /**
  * @typedef {import("node:http").IncomingMessage} IncomingMessage
@@ -37,6 +38,12 @@ function getApiWords(req, res, url) {
 }
 
 /**
+ * 起動時に読み込む README.md の本文。
+ * @type {string}
+ */
+const readmeBody = await readFile("README.md", "utf-8");
+
+/**
  * GET / のハンドラ。
  * @param {IncomingMessage} _req
  * @param {ServerResponse} res
@@ -44,10 +51,7 @@ function getApiWords(req, res, url) {
  */
 function getRoot(_req, res) {
   res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
-  res.end(
-    '<!doctype html><html lang="ja"><meta charset="utf-8"><title>factory-sandbox</title>' +
-      "<h1>factory-sandbox</h1><p>sakura-software-factory のステージングで動いています。</p></html>\n",
-  );
+  res.end(`<!doctype html><html lang="ja"><meta charset="utf-8"><title>factory-sandbox</title><pre>${escapeHtml(readmeBody)}</pre></html>\n`);
 }
 
 /**
