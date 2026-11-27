@@ -19,3 +19,20 @@ export function countWords(input) {
   }
   return normalized.split(" ").filter((token) => /[\p{L}\p{N}]/u.test(token)).length;
 }
+
+/**
+ * 文字列をコードポイント単位で指定の長さに切り詰める。
+ * @param {string} input
+ * @param {number} max
+ * @returns {string}
+ */
+export function truncate(input, max) {
+  if (max < 1) {
+    throw new RangeError("max は 1 以上である必要があります");
+  }
+  const chars = [...input];
+  if (chars.length <= max) {
+    return input;
+  }
+  return chars.slice(0, max - 1).join("") + "…";
+}
