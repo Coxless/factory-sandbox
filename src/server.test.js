@@ -33,6 +33,17 @@ test("知らないパスは 404", async () => {
   assert.equal(res.status, 404);
 });
 
+test("POST /healthz は 405 method not allowed", async () => {
+  const res = await fetch(`${base}/healthz`, { method: "POST" });
+  assert.equal(res.status, 405);
+  assert.equal(await res.text(), "method not allowed\n");
+});
+
+test("DELETE /api/words は 405", async () => {
+  const res = await fetch(`${base}/api/words`, { method: "DELETE" });
+  assert.equal(res.status, 405);
+});
+
 test("GET /api/words?text=hello%20world は単語数を返す", async () => {
   const res = await fetch(`${base}/api/words?text=hello%20world`);
   assert.equal(res.status, 200);
