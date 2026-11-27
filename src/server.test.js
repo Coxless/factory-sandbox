@@ -16,50 +16,54 @@ before(async () => {
 
 after(() => new Promise((resolve) => server.close(() => resolve(undefined))));
 
+/**
+ * @param {string} path
+ * @param {number} [expectedStatus]
+ * @param {RequestInit} [options]
+ * @returns {Promise<Response>}
+ */
+async function request(path, expectedStatus = 200, options) {
+  const res = await fetch(`${base}${path}`, options);
+  assert.equal(res.status, expectedStatus);
+  return res;
+}
+
 test("/healthz は 200 と status: ok を返す", async () => {
-  const res = await fetch(`${base}/healthz`);
-  assert.equal(res.status, 200);
+  const res = await request("/healthz");
   assert.deepEqual(await res.json(), { status: "ok" });
 });
 
 test("/ は HTML を返す", async () => {
-  const res = await fetch(`${base}/`);
-  assert.equal(res.status, 200);
+  const res = await request("/");
   assert.match(await res.text(), /factory-sandbox/);
 });
 
 test("知らないパスは 404", async () => {
-  const res = await fetch(`${base}/nope`);
-  assert.equal(res.status, 404);
+  await request("/nope", 404);
 });
 
 test("POST /healthz は 405 method not allowed", async () => {
-  const res = await fetch(`${base}/healthz`, { method: "POST" });
-  assert.equal(res.status, 405);
+  const res = await request("/healthz", 405, { method: "POST" });
   assert.equal(await res.text(), "method not allowed\n");
 });
 
 test("DELETE /api/words は 405", async () => {
-  const res = await fetch(`${base}/api/words`, { method: "DELETE" });
-  assert.equal(res.status, 405);
+  await request("/api/words", 405, { method: "DELETE" });
 });
 
 test("GET /api/words?text=hello%20world は単語数を返す", async () => {
-  const res = await fetch(`${base}/api/words?text=hello%20world`);
-  assert.equal(res.status, 200);
+  const res = await request("/api/words?text=hello%20world");
   assert.equal(res.headers.get("content-type"), "application/json");
   assert.deepEqual(await res.json(), { text: "hello world", words: 2 });
 });
 
 test("GET /api/words?text=日本語の全角スペース区切りも数える", async () => {
-  const res = await fetch(`${base}/api/words?text=${encodeURIComponent("こんにちは　世界")}`);
-  assert.equal(res.status, 200);
+  const res = await request(`/api/words?text=${encodeURIComponent("こんにちは　世界")}`);
   assert.deepEqual(await res.json(), { text: "こんにちは　世界", words: 2 });
 });
 
 test("GET /api/words で text がないときは 400", async () => {
-  const res = await fetch(`${base}/api/words`);
-  assert.equal(res.status, 400);
+  const res = await request("/api/words", 400);
   assert.equal(res.headers.get("content-type"), "application/json");
   assert.deepEqual(await res.json(), { error: "text is required" });
 });
