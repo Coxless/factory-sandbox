@@ -8,6 +8,42 @@ Issue に `@agent <依頼>` とコメントすると、ファクトリーが計�
 - ステージング: main にマージされると、ファクトリーが `Dockerfile` でビルドして入れ替える。`GET /healthz` が通らなければ直前の版に戻す
 - ローカルで動かす: `node src/server.js`（`PORT` 既定 3000）
 
+## ライブラリ
+
+`src/text.js` で公開している関数。
+
+### `normalizeSpaces(input)`
+
+文字列の前後の空白を取り除き、連続する空白を 1 つにまとめる。
+
+- `input`: 対象の文字列（`string`）
+- 戻り値: 正規化された文字列（`string`）
+
+例:
+
+```js
+import { normalizeSpaces } from "./src/text.js";
+
+normalizeSpaces("  hello   world  ");
+// => "hello world"
+```
+
+### `countWords(input)`
+
+文字列に含まれる単語の数を数える。空白区切りで、英数字または文字を含むトークンを単語として扱う。
+
+- `input`: 対象の文字列（`string`）
+- 戻り値: 単語の数（`number`）
+
+例:
+
+```js
+import { countWords } from "./src/text.js";
+
+countWords("hello world");
+// => 2
+```
+
 ## HTTP API
 
 ステージングで動いている HTTP API のエンドポイント。
