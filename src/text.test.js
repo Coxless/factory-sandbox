@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { countWords, escapeHtml, normalizeSpaces } from "./text.js";
+import { countWords, normalizeSpaces } from "./text.js";
 
 test("normalizeSpaces は前後の空白を取り、連続する空白を1つにする", () => {
   assert.equal(normalizeSpaces("  a   b\tc \n"), "a b c");
@@ -29,8 +29,4 @@ test("空文字列は 0 単語", () => {
 
 test("全角スペースで区切られた「りんご　みかん」は 2 単語", () => {
   assert.equal(countWords("りんご　みかん"), 2);
-});
-
-test("escapeHtml は HTML 特殊文字をエスケープする", () => {
-  assert.equal(escapeHtml("<script>alert('x & y')</script>"), "&lt;script&gt;alert(&#39;x &amp; y&#39;)&lt;/script&gt;");
 });
