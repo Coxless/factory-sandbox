@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { countWords, normalizeSpaces } from "./text.js";
+import { countWords, normalizeSpaces, truncate } from "./text.js";
 
 test("normalizeSpaces は前後の空白を取り、連続する空白を1つにする", () => {
   assert.equal(normalizeSpaces("  a   b\tc \n"), "a b c");
@@ -35,4 +35,37 @@ test("countWords は記号だけの語を数えない", () => {
   assert.equal(countWords("a 、 b"), 2);
   assert.equal(countWords("こんにちは 。"), 1);
   assert.equal(countWords("- - -"), 0);
+});
+
+test("truncate は短い文字列をそのまま返す", () => {
+  assert.equal(truncate("hello", 10), "hello");
+});
+
+test("truncate は長い ASCII 文字列を切り詰める", () => {
+  assert.equal(truncate("hello world", 8), "hello w…");
+});
+
+test("truncate はちょうど max の長さの文字列をそのまま返す", () => {
+  assert.equal(truncate("hello", 5), "hello");
+});
+
+test("truncate は max=1 のとき '…' を返す", () => {
+  assert.equal(truncate("hello", 1), "…");
+});
+
+test("truncate は max が 1 未満のとき RangeError を投げる", () => {
+  assert.throws(() => truncate("hello", 0), RangeError);
+  assert.throws(() => truncate("hello", -1), RangeError);
+});
+
+test("truncate は絵文字をコードポイント単位で切り詰める", () => {
+  assert.equal(truncate("👨‍👩‍👧‍👦家族", 5), "👨‍👩‍…");
+  assert.equal(truncate("🎉", 2), "🎉");
+  assert.equal(truncate("🎉🎊🎁", 2), "🎉…");
+});
+
+test("truncate は日本語を正しく切り詰める", () => {
+  assert.equal(truncate("こんにちは世界", 7), "こんにちは世界");
+  assert.equal(truncate("こんにちは世界", 6), "こんにちは…");
+  assert.equal(truncate("日本語", 4), "日本語");
 });
