@@ -30,3 +30,9 @@ test("空文字列は 0 単語", () => {
 test("全角スペースで区切られた「りんご　みかん」は 2 単語", () => {
   assert.equal(countWords("りんご　みかん"), 2);
 });
+
+test("countWords は記号だけの語を数えない", () => {
+  assert.equal(countWords("a 、 b"), 2);
+  assert.equal(countWords("こんにちは 。"), 1);
+  assert.equal(countWords("- - -"), 0);
+});
