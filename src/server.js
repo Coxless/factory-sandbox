@@ -14,8 +14,7 @@ import { countWords, normalizeSpaces } from "./text.js";
  * @returns {void}
  */
 function getHealthz(req, res) {
-  res.writeHead(200, { "content-type": "application/json" });
-  res.end(req.method === "HEAD" ? undefined : JSON.stringify({ status: "ok" }));
+  sendJson(res, 200, req.method === "HEAD" ? undefined : { status: "ok" });
 }
 
 /**
@@ -28,12 +27,10 @@ function getHealthz(req, res) {
 function getApiWords(req, res, url) {
   const text = url.searchParams.get("text");
   if (text === null || text === "") {
-    res.writeHead(400, { "content-type": "application/json" });
-    res.end(JSON.stringify({ error: "text is required" }));
+    sendJson(res, 400, { error: "text is required" });
     return;
   }
-  res.writeHead(200, { "content-type": "application/json" });
-  res.end(JSON.stringify({ text, words: countWords(text) }));
+  sendJson(res, 200, { text, words: countWords(text) });
 }
 
 /**
@@ -46,12 +43,10 @@ function getApiWords(req, res, url) {
 function getApiNormalize(req, res, url) {
   const text = url.searchParams.get("text");
   if (text === null || text === "") {
-    res.writeHead(400, { "content-type": "application/json" });
-    res.end(JSON.stringify({ error: "text is required" }));
+    sendJson(res, 400, { error: "text is required" });
     return;
   }
-  res.writeHead(200, { "content-type": "application/json" });
-  res.end(JSON.stringify({ text, normalized: normalizeSpaces(text) }));
+  sendJson(res, 200, { text, normalized: normalizeSpaces(text) });
 }
 
 /**
@@ -114,6 +109,18 @@ function normalizePathname(pathname) {
 function respond(req, res, statusCode, headers, body) {
   res.writeHead(statusCode, headers);
   res.end(req.method === "HEAD" ? undefined : body);
+}
+
+/**
+ * JSON 本文を返す。
+ * @param {ServerResponse} res
+ * @param {number} status
+ * @param {unknown} body
+ * @returns {void}
+ */
+function sendJson(res, status, body) {
+  res.writeHead(status, { "content-type": "application/json" });
+  res.end(JSON.stringify(body));
 }
 
 /**
