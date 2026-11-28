@@ -59,7 +59,7 @@ curl http://localhost:3000/healthz
 レスポンス:
 
 ```json
-{"status": "ok"}
+{"status":"ok"}
 ```
 
 ### `GET /api/words?text=<文字列>`
@@ -67,13 +67,13 @@ curl http://localhost:3000/healthz
 指定した文字列に含まれる単語数と行数を返す。
 
 ```bash
-curl "http://localhost:3000/api/words?text=hello+world"
+curl "http://localhost:3000/api/words?text=hello%20world"
 ```
 
 レスポンス:
 
 ```json
-{"text": "hello world", "words": 2, "lines": 1}
+{"text":"hello world","words":2,"lines":1}
 ```
 
 `text` パラメータがない場合は `400` を返す。
@@ -85,7 +85,7 @@ curl http://localhost:3000/api/words
 レスポンス:
 
 ```json
-{"error": "text is required"}
+{"error":"text is required"}
 ```
 
 `text` パラメータを複数指定した場合も `400` を返す。
@@ -97,7 +97,7 @@ curl "http://localhost:3000/api/words?text=a&text=b"
 レスポンス:
 
 ```json
-{"error": "text must be given once"}
+{"error":"text must be given once"}
 ```
 
 ### `GET /api/normalize?text=<文字列>`
@@ -105,13 +105,13 @@ curl "http://localhost:3000/api/words?text=a&text=b"
 指定した文字列の前後の空白を取り除き、連続する空白を 1 つにまとめた結果を返す。
 
 ```bash
-curl "http://localhost:3000/api/normalize?text=hello++world"
+curl "http://localhost:3000/api/normalize?text=hello%20%20world"
 ```
 
 レスポンス:
 
 ```json
-{"text": "hello  world", "normalized": "hello world"}
+{"text":"hello  world","normalized":"hello world"}
 ```
 
 `text` パラメータがない場合は `400` を返す。
@@ -123,7 +123,7 @@ curl http://localhost:3000/api/normalize
 レスポンス:
 
 ```json
-{"error": "text is required"}
+{"error":"text is required"}
 ```
 
 ### `GET /api/stats?text=<文字列>`
@@ -131,13 +131,13 @@ curl http://localhost:3000/api/normalize
 指定した文字列の単語数、文字数（コードポイント数）、UTF-8 バイト数を返す。
 
 ```bash
-curl "http://localhost:3000/api/stats?text=hello+world"
+curl "http://localhost:3000/api/stats?text=hello%20world"
 ```
 
 レスポンス:
 
 ```json
-{"words": 2, "chars": 11, "bytes": 11}
+{"words":2,"chars":11,"bytes":11}
 ```
 
 日本語や絵文字も文字数と UTF-8 バイト数を区別して返す。
@@ -149,7 +149,7 @@ curl "http://localhost:3000/api/stats?text=%E3%81%93%E3%82%93%E3%81%AB%E3%81%A1%
 レスポンス:
 
 ```json
-{"words": 1, "chars": 5, "bytes": 15}
+{"words":1,"chars":5,"bytes":15}
 ```
 
 `text` パラメータがない場合は `400` を返す。
@@ -161,10 +161,10 @@ curl http://localhost:3000/api/stats
 レスポンス:
 
 ```json
-{"error": "text is required"}
+{"error":"text is required"}
 ```
 
-未知のパスに対しては `404` を返す。`/api/` で始まるパスの場合は `{"error": "not found"}`（`content-type: application/json; charset=utf-8`）、それ以外のパスはテキストで返す。GET 以外の HTTP メソッドに対しては `405` を返す。
+未知のパスに対しては `404` を返す。`/api/` で始まるパスの場合は `{"error":"not found"}`（`content-type: application/json; charset=utf-8`）、それ以外のパスはテキストで返す。GET 以外の HTTP メソッドに対しては `405` を返す。
 
 ## 開発
 
