@@ -115,3 +115,37 @@ curl http://localhost:3000/api/normalize
 ```
 
 未知のパスに対しては `404`、GET 以外の HTTP メソッドに対しては `405` を返す。
+
+## 開発
+
+### 依存のインストール
+
+```bash
+pnpm install
+```
+
+### テスト
+
+すべてのテストを実行する:
+
+```bash
+pnpm run check
+```
+
+1 つのテストファイルだけを流す場合:
+
+```bash
+node --test src/text.test.js
+```
+
+### ローカルでサーバーを動かす
+
+```bash
+node src/server.js
+```
+
+別のターミナルで `/healthz` を叩く:
+
+```bash
+curl http://localhost:3000/healthz
+```
