@@ -44,6 +44,18 @@ test("全角スペースで区切られた「りんご　みかん」は 2 単�
   assert.equal(countWords("りんご　みかん"), 2);
 });
 
+test("countWords は改行で区切られた 3 語を数える", () => {
+  assert.equal(countWords("one\ntwo\nthree"), 3);
+});
+
+test("countWords はタブで区切られた 2 語を数える", () => {
+  assert.equal(countWords("one\ttwo"), 2);
+});
+
+test("countWords は改行とタブと空白が混在した文字列を数える", () => {
+  assert.equal(countWords("one \t two \n three"), 3);
+});
+
 test("countWords は記号だけの語を数えない", () => {
   assert.equal(countWords("a 、 b"), 2);
   assert.equal(countWords("こんにちは 。"), 1);
