@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { countChars, countWords, normalizeSpaces, truncate } from "./text.js";
+import { countChars, countLines, countWords, normalizeSpaces, truncate } from "./text.js";
 
 test("normalizeSpaces は前後の空白を取り、連続する空白を1つにする", () => {
   assert.equal(normalizeSpaces("  a   b\tc \n"), "a b c");
@@ -109,4 +109,22 @@ test("countChars は結合文字を含む入力も 1 文字と数える", () => 
 
 test("countChars は空文字列を 0 と返す", () => {
   assert.equal(countChars(""), 0);
+});
+
+test("countLines は空文字列を 0 と返す", () => {
+  assert.equal(countLines(""), 0);
+});
+
+test("countLines は改行を含まない文字列を 1 行と数える", () => {
+  assert.equal(countLines("a"), 1);
+});
+
+test("countLines は \\n で区切った行数を数える", () => {
+  assert.equal(countLines("a\nb"), 2);
+  assert.equal(countLines("a\n"), 1);
+});
+
+test("countLines は \\r\\n で区切った行数を数える", () => {
+  assert.equal(countLines("a\r\nb"), 2);
+  assert.equal(countLines("a\r\n"), 1);
 });

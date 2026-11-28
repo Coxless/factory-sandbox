@@ -31,6 +31,23 @@ export function countChars(input) {
 }
 
 /**
+ * 改行（\n、\r\n）で区切った行数を数える。空文字列は 0、末尾の改行は数えない。
+ * @param {string} input
+ * @returns {number}
+ */
+export function countLines(input) {
+  if (input === "") {
+    return 0;
+  }
+  const normalized = input.replace(/\r\n/g, "\n");
+  const parts = normalized.split("\n");
+  if (parts[parts.length - 1] === "") {
+    return parts.length - 1;
+  }
+  return parts.length;
+}
+
+/**
  * 文字列をコードポイント単位で指定の長さに切り詰める。
  * @param {string} input
  * @param {number} max
