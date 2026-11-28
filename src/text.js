@@ -69,6 +69,12 @@ export function countWords(input) {
 }
 
 /**
+ * 書記素クラスター（見た目の1文字）単位で文字列を分割する Segmenter。
+ * 日本語ロケール、grapheme 粒度で1つだけ生成して使い回す。
+ */
+const SEGMENTER = new Intl.Segmenter("ja", { granularity: "grapheme" });
+
+/**
  * 書記素クラスター（見た目の1文字）単位で文字数を数える。
  * @param {string} input
  * @returns {number}
@@ -78,8 +84,7 @@ export function countWords(input) {
  * countChars("👨‍👩‍👧‍👦"); // => 1
  */
 export function countChars(input) {
-  const segmenter = new Intl.Segmenter("ja", { granularity: "grapheme" });
-  return Array.from(segmenter.segment(input)).length;
+  return Array.from(SEGMENTER.segment(input)).length;
 }
 
 /**
