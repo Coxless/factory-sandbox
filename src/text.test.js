@@ -18,6 +18,19 @@ test("normalizeSpaces は空白だけの文字列を空文字列にする", () =
   assert.equal(normalizeSpaces("   \t\n  "), "");
 });
 
+test("normalizeSpaces は全角スペースを半角スペース 1 つにまとめる", () => {
+  assert.equal(normalizeSpaces("a　　b"), "a b");
+});
+
+test("normalizeSpaces は \\r\\n を含む空白を半角スペース 1 つにまとめる", () => {
+  assert.equal(normalizeSpaces("a\r\nb"), "a b");
+  assert.equal(normalizeSpaces("a  \r\n  b"), "a b");
+});
+
+test("normalizeSpaces は前後の全角スペースを取る", () => {
+  assert.equal(normalizeSpaces("　a b　"), "a b");
+});
+
 test("countWords は空白区切りの単語を数える", () => {
   assert.equal(countWords("hello  world"), 2);
   assert.equal(countWords("   "), 0);
