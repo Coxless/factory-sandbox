@@ -81,6 +81,27 @@ const routes = new Map([
 ]);
 
 /**
+ * 末尾のスラッシュを正規化する。
+ * "/" 自体はそのままにし、1 つだけの末尾スラッシュは取り除く。
+ * 2 つ以上続くスラッシュは正規化せず null を返す。
+ * @param {string} pathname
+ * @returns {string | null}
+ */
+function normalizePathname(pathname) {
+  if (pathname === "/") {
+    return pathname;
+  }
+  if (pathname.endsWith("/")) {
+    const trimmed = pathname.slice(0, -1);
+    if (trimmed.endsWith("/")) {
+      return null;
+    }
+    return trimmed;
+  }
+  return pathname;
+}
+
+/**
  * ステージングで動くデモアプリの HTTP サーバーを作る（待ち受けは呼び出し側）。
  * `GET /healthz` は正常なら 200 を返す（ファクトリーのヘルスチェックが使う）。
  * @returns {import("node:http").Server}
@@ -94,7 +115,15 @@ export function createApp() {
     }
 
     const url = new URL(req.url ?? "", "http://localhost");
-    const handler = routes.get(url.pathname);
+    const pathname = normalizePathname(url.pathname);
+
+    if (pathname === null) {
+      res.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
+      res.end("not found\n");
+      return;
+    }
+
+    const handler = routes.get(pathname);
 
     if (handler !== undefined) {
       handler(req, res, url);
