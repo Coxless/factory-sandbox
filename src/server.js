@@ -27,7 +27,7 @@ function getHealthz(_req, res) {
  */
 function getApiWords(req, res, url) {
   const text = url.searchParams.get("text");
-  if (text === null) {
+  if (text === null || text === "") {
     res.writeHead(400, { "content-type": "application/json" });
     res.end(JSON.stringify({ error: "text is required" }));
     return;

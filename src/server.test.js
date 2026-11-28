@@ -67,3 +67,15 @@ test("GET /api/words で text がないときは 400", async () => {
   assert.equal(res.headers.get("content-type"), "application/json");
   assert.deepEqual(await res.json(), { error: "text is required" });
 });
+
+test("GET /api/words?text= は空文字列なので 400", async () => {
+  const res = await request("/api/words?text=", 400);
+  assert.equal(res.headers.get("content-type"), "application/json");
+  assert.deepEqual(await res.json(), { error: "text is required" });
+});
+
+test("GET /api/words?text=%20%20 は空白だけなので words: 0", async () => {
+  const res = await request("/api/words?text=%20%20");
+  assert.equal(res.headers.get("content-type"), "application/json");
+  assert.deepEqual(await res.json(), { text: "  ", words: 0 });
+});
