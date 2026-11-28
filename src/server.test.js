@@ -181,3 +181,17 @@ test("GET /api/words?text=<10001文字> は 413 を返す", async () => {
   assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
   assert.deepEqual(await res.json(), { error: "text is too long" });
 });
+
+test("登録されている全 GET ルートが 404 以外を返す", async () => {
+  const routes = [
+    "/",
+    "/healthz",
+    "/api/words?text=a",
+    "/api/normalize?text=a",
+    "/api/stats?text=a",
+  ];
+  for (const path of routes) {
+    const res = await fetch(`${base}${path}`);
+    assert.notEqual(res.status, 404, `${path} は 404 を返してはいけない`);
+  }
+});
