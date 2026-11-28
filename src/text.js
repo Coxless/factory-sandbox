@@ -38,6 +38,19 @@ export function countLines(input) {
 }
 
 /**
+ * 空白文字で分割し、空の要素を除いた文字列配列を返す。
+ * @param {string} input
+ * @returns {string[]}
+ * @example
+ * splitWords("hello  world"); // => ["hello", "world"]
+ * @example
+ * splitWords("  a \t b \n "); // => ["a", "b"]
+ */
+export function splitWords(input) {
+  return input.split(/\s+/).filter((token) => token !== "");
+}
+
+/**
  * 単語の数を数える（空白区切り）。
  * @param {string} input
  * @returns {number}
@@ -48,10 +61,7 @@ export function countLines(input) {
  */
 export function countWords(input) {
   const normalized = normalizeSpaces(input);
-  if (normalized === "") {
-    return 0;
-  }
-  return normalized.split(" ").filter((token) => LETTER_OR_NUMBER.test(token)).length;
+  return splitWords(normalized).filter((token) => LETTER_OR_NUMBER.test(token)).length;
 }
 
 /**
