@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { countChars, countLines, countWords, getStats, normalizeSpaces, truncate } from "./text.js";
+import { countChars, countLines, countWords, getStats, normalizeSpaces, splitWords, truncate } from "./text.js";
 
 test("normalizeSpaces は前後の空白を取り、連続する空白を1つにする", () => {
   assert.equal(normalizeSpaces("  a   b\tc \n"), "a b c");
@@ -171,4 +171,32 @@ test("getStats は絵文字をコードポイント単位で数える", () => {
 
 test("getStats は前後の空白を無視して単語を数える", () => {
   assert.deepEqual(getStats("  a b c  "), { words: 3, chars: 9, bytes: 9 });
+});
+
+test("splitWords は連続した空白を 1 つの区切りとして分割する", () => {
+  assert.deepEqual(splitWords("hello  world"), ["hello", "world"]);
+});
+
+test("splitWords は前後の空白を無視する", () => {
+  assert.deepEqual(splitWords("  a b  "), ["a", "b"]);
+});
+
+test("splitWords は空文字列を空配列にする", () => {
+  assert.deepEqual(splitWords(""), []);
+});
+
+test("splitWords は空白だけの文字列を空配列にする", () => {
+  assert.deepEqual(splitWords("   \t\n  "), []);
+});
+
+test("splitWords はタブや改行を区切りとして扱う", () => {
+  assert.deepEqual(splitWords("one\ttwo\nthree"), ["one", "two", "three"]);
+});
+
+test("splitWords は全角スペースも区切りとして扱う", () => {
+  assert.deepEqual(splitWords("りんご　みかん"), ["りんご", "みかん"]);
+});
+
+test("splitWords は空の要素を除く", () => {
+  assert.deepEqual(splitWords("a  ,  b"), ["a", ",", "b"]);
 });
