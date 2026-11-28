@@ -164,7 +164,7 @@ curl http://localhost:3000/api/stats
 {"error": "text is required"}
 ```
 
-未知のパスに対しては `404`、GET 以外の HTTP メソッドに対しては `405` を返す。
+未知のパスに対しては `404` を返す。`/api/` で始まるパスの場合は `{"error": "not found"}`（`content-type: application/json; charset=utf-8`）、それ以外のパスはテキストで返す。GET 以外の HTTP メソッドに対しては `405` を返す。
 
 ## 開発
 

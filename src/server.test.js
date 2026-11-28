@@ -40,8 +40,16 @@ test("/ は HTML を返す", async () => {
   assert.match(await res.text(), /factory-sandbox/);
 });
 
-test("知らないパスは 404", async () => {
-  await request("/nope", 404);
+test("知らない /api/ 配下のパスは JSON の 404 を返す", async () => {
+  const res = await request("/api/not-exists", 404);
+  assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
+  assert.deepEqual(await res.json(), { error: "not found" });
+});
+
+test("知らない非 /api/ のパスはテキストの 404 を返す", async () => {
+  const res = await request("/nope", 404);
+  assert.equal(res.headers.get("content-type"), "text/plain; charset=utf-8");
+  assert.equal(await res.text(), "not found\n");
 });
 
 test("HEAD /healthz は 200 で本文なし", async () => {

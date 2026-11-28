@@ -163,6 +163,22 @@ function sendJson(res, status, body) {
 }
 
 /**
+ * 存在しないパスに対する 404 応答を返す。
+ * `/api/` で始まるパスは JSON、それ以外はテキストで応答する。
+ * @param {IncomingMessage} req
+ * @param {ServerResponse} res
+ * @param {string} pathname
+ * @returns {void}
+ */
+function sendNotFound(req, res, pathname) {
+  if (pathname.startsWith("/api/")) {
+    sendJson(res, 404, { error: "not found" });
+    return;
+  }
+  respond(req, res, 404, { "content-type": "text/plain; charset=utf-8" }, "not found\n");
+}
+
+/**
  * ステージングで動くデモアプリの HTTP サーバーを作る（待ち受けは呼び出し側）。
  * `GET /healthz` は正常なら 200 を返す（ファクトリーのヘルスチェックが使う）。
  *
@@ -172,6 +188,8 @@ function sendJson(res, status, body) {
  * - `GET /api/normalize?text=...` → 200 `{ text, normalized }` または 400 `{ error: "text is required" }`
  * - `GET /api/stats?text=...` → 200 `{ words, chars, bytes }` または 400 `{ error: "text is required" }`
  * - `GET /` → 200 HTML
+ * - その他の `/api/` で始まるパス → 404 `{ error: "not found" }`（JSON）
+ * - それ以外の未知のパス → 404 テキスト
  *
  * @returns {import("node:http").Server}
  */
@@ -190,7 +208,7 @@ export function createApp() {
     const pathname = normalizePathname(url.pathname);
 
     if (pathname === null) {
-      respond(req, res, 404, { "content-type": "text/plain; charset=utf-8" }, "not found\n");
+      sendNotFound(req, res, url.pathname);
       return;
     }
 
@@ -201,7 +219,7 @@ export function createApp() {
       return;
     }
 
-    respond(req, res, 404, { "content-type": "text/plain; charset=utf-8" }, "not found\n");
+    sendNotFound(req, res, url.pathname);
   });
 }
 
