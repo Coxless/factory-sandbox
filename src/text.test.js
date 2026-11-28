@@ -166,11 +166,16 @@ test("getStats は日本語の文字数と UTF-8 バイト数を返す", () => {
 });
 
 test("getStats は絵文字をコードポイント単位で数える", () => {
-  assert.deepEqual(getStats("🎉🎊"), { words: 1, chars: 2, bytes: 8 });
+  assert.deepEqual(getStats("🎉🎊"), { words: 0, chars: 2, bytes: 8 });
 });
 
 test("getStats は前後の空白を無視して単語を数える", () => {
   assert.deepEqual(getStats("  a b c  "), { words: 3, chars: 9, bytes: 9 });
+});
+
+test("getStats の words は countWords と同じく記号だけの語を除いて数える", () => {
+  assert.deepEqual(getStats("a 、 b"), { words: 2, chars: 5, bytes: 7 });
+  assert.equal(getStats("a 、 b").words, countWords("a 、 b"));
 });
 
 test("splitWords は連続した空白を 1 つの区切りとして分割する", () => {
