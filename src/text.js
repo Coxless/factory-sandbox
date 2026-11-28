@@ -21,6 +21,16 @@ export function countWords(input) {
 }
 
 /**
+ * 書記素クラスター（見た目の1文字）単位で文字数を数える。
+ * @param {string} input
+ * @returns {number}
+ */
+export function countChars(input) {
+  const segmenter = new Intl.Segmenter("ja", { granularity: "grapheme" });
+  return Array.from(segmenter.segment(input)).length;
+}
+
+/**
  * 文字列をコードポイント単位で指定の長さに切り詰める。
  * @param {string} input
  * @param {number} max
