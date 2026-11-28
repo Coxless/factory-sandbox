@@ -127,3 +127,33 @@ test("GET /api/words/?text=a は末尾スラッシュを無視して 200 を返�
 test("GET /api/words// は 404", async () => {
   await request("/api/words//", 404);
 });
+
+test("GET /api/stats?text=hello%20world は統計を返す", async () => {
+  const res = await request("/api/stats?text=hello%20world");
+  assert.equal(res.headers.get("content-type"), "application/json");
+  assert.deepEqual(await res.json(), { words: 2, chars: 11, bytes: 11 });
+});
+
+test("GET /api/stats?text=こんにちは は chars:5 bytes:15 を返す", async () => {
+  const res = await request(`/api/stats?text=${encodeURIComponent("こんにちは")}`);
+  assert.equal(res.headers.get("content-type"), "application/json");
+  assert.deepEqual(await res.json(), { words: 1, chars: 5, bytes: 15 });
+});
+
+test("GET /api/stats で text がないときは 400", async () => {
+  const res = await request("/api/stats", 400);
+  assert.equal(res.headers.get("content-type"), "application/json");
+  assert.deepEqual(await res.json(), { error: "text is required" });
+});
+
+test("GET /api/stats?text= は空文字列なので 400", async () => {
+  const res = await request("/api/stats?text=", 400);
+  assert.equal(res.headers.get("content-type"), "application/json");
+  assert.deepEqual(await res.json(), { error: "text is required" });
+});
+
+test("GET /api/stats/ は末尾スラッシュを無視して 200 を返す", async () => {
+  const res = await request("/api/stats/?text=hello");
+  assert.equal(res.headers.get("content-type"), "application/json");
+  assert.deepEqual(await res.json(), { words: 1, chars: 5, bytes: 5 });
+});
