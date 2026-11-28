@@ -144,7 +144,7 @@ function respond(req, res, statusCode, headers, body) {
  * @returns {void}
  */
 function sendJson(res, status, body) {
-  res.writeHead(status, { "content-type": "application/json" });
+  res.writeHead(status, { "content-type": "application/json; charset=utf-8" });
   res.end(JSON.stringify(body));
 }
 
