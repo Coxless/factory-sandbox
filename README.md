@@ -44,6 +44,71 @@ countWords("hello world");
 // => 2
 ```
 
+### `countLines(input)`
+
+文字列に含まれる行数を数える。`\n` と `\r\n` を改行として扱い、空文字列は 0、末尾の改行は数えない。
+
+- `input`: 対象の文字列（`string`）
+- 戻り値: 行数（`number`）
+
+例:
+
+```js
+import { countLines } from "./src/text.js";
+
+countLines("a\nb\nc");
+// => 3
+```
+
+### `countChars(input)`
+
+文字列の文字数を書記素クラスター単位で数える。
+
+- `input`: 対象の文字列（`string`）
+- 戻り値: 文字数（`number`）
+
+例:
+
+```js
+import { countChars } from "./src/text.js";
+
+countChars("日本語");
+// => 3
+```
+
+### `getStats(input)`
+
+文字列の統計情報を返す。単語数、文字数（書記素クラスター数）、UTF-8 バイト数を含む。
+
+- `input`: 対象の文字列（`string`）
+- 戻り値: `{ words: number, chars: number, bytes: number }`
+
+例:
+
+```js
+import { getStats } from "./src/text.js";
+
+getStats("hello  world");
+// => { words: 2, chars: 12, bytes: 12 }
+```
+
+### `truncate(input, max)`
+
+文字列を指定の長さに切り詰める。`max` は 1 以上の整数。
+
+- `input`: 対象の文字列（`string`）
+- `max`: 最大の長さ（`number`）
+- 戻り値: 切り詰められた文字列（`string`）
+
+例:
+
+```js
+import { truncate } from "./src/text.js";
+
+truncate("hello world", 8);
+// => "hello w…"
+```
+
 ## HTTP API
 
 ステージングで動いている HTTP API のエンドポイント。
