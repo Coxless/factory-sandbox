@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { countWords, normalizeSpaces, truncate } from "./text.js";
+import { countChars, countWords, normalizeSpaces, truncate } from "./text.js";
 
 test("normalizeSpaces は前後の空白を取り、連続する空白を1つにする", () => {
   assert.equal(normalizeSpaces("  a   b\tc \n"), "a b c");
@@ -93,4 +93,20 @@ test("truncate は日本語を正しく切り詰める", () => {
   assert.equal(truncate("こんにちは世界", 7), "こんにちは世界");
   assert.equal(truncate("こんにちは世界", 6), "こんにちは…");
   assert.equal(truncate("日本語", 4), "日本語");
+});
+
+test("countChars は家族絵文字を 1 文字と数える", () => {
+  assert.equal(countChars("👨‍👩‍👧"), 1);
+});
+
+test("countChars はひらがなを文字数通り数える", () => {
+  assert.equal(countChars("がぎ"), 2);
+});
+
+test("countChars は結合文字を含む入力も 1 文字と数える", () => {
+  assert.equal(countChars("がぎ"), 2);
+});
+
+test("countChars は空文字列を 0 と返す", () => {
+  assert.equal(countChars(""), 0);
 });
