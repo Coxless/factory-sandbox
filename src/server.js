@@ -1,6 +1,6 @@
 import { createServer } from "node:http";
 import { pathToFileURL } from "node:url";
-import { countLines, countWords, getStats, normalizeSpaces } from "./text.js";
+import { countLines, countWords, getStats, normalizeSpaces, truncate } from "./text.js";
 
 /**
  * @typedef {import("node:http").IncomingMessage} IncomingMessage
@@ -109,6 +109,31 @@ function getApiStats(_req, res, url) {
 }
 
 /**
+ * GET /api/truncate のハンドラ。
+ * 200: { text, truncated }
+ * 400: { error: "text is required" }
+ * 400: { error: "max must be a positive integer" }
+ * @param {IncomingMessage} _req
+ * @param {ServerResponse} res
+ * @param {URL} url
+ * @returns {void}
+ */
+function getApiTruncate(_req, res, url) {
+  const text = url.searchParams.get("text");
+  if (text === null || text === "") {
+    sendJson(res, 400, { error: "text is required" });
+    return;
+  }
+  const maxParam = url.searchParams.get("max");
+  const max = maxParam === null ? NaN : Number(maxParam);
+  if (!Number.isInteger(max) || max < 1) {
+    sendJson(res, 400, { error: "max must be a positive integer" });
+    return;
+  }
+  sendJson(res, 200, { text, truncated: truncate(text, max) });
+}
+
+/**
  * GET / のハンドラ。
  * 200: HTML 本文
  * @param {IncomingMessage} _req
@@ -133,6 +158,7 @@ const routes = new Map([
   ["/api/words", getApiWords],
   ["/api/normalize", getApiNormalize],
   ["/api/stats", getApiStats],
+  ["/api/truncate", getApiTruncate],
   ["/", getRoot],
 ]);
 
@@ -209,6 +235,7 @@ function sendNotFound(req, res, pathname) {
  * - `GET /api/words?text=...` → 200 `{ text, words, lines }`、400 `{ error: "text is required" }`、400 `{ error: "text must be given once" }`、または 413 `{ error: "text is too long" }`
  * - `GET /api/normalize?text=...` → 200 `{ text, normalized }`、400 `{ error: "text is required" }`、400 `{ error: "text must be given once" }`、または 413 `{ error: "text is too long" }`
  * - `GET /api/stats?text=...` → 200 `{ words, chars, bytes }`、400 `{ error: "text is required" }`、400 `{ error: "text must be given once" }`、または 413 `{ error: "text is too long" }`
+ * - `GET /api/truncate?text=...&max=...` → 200 `{ text, truncated }`、400 `{ error: "text is required" }`、または 400 `{ error: "max must be a positive integer" }`
  * - `GET /` → 200 HTML
  * - その他の `/api/` で始まるパス → 404 `{ error: "not found" }`（JSON）
  * - それ以外の未知のパス → 404 テキスト

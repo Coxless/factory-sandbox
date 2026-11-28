@@ -212,6 +212,44 @@ curl "http://localhost:3000/api/stats?text=$(python3 -c 'print("a"*10001)')"
 {"error":"text is too long"}
 ```
 
+### `GET /api/truncate?text=<文字列>&max=<整数>`
+
+指定した文字列を `max` の長さに切り詰めた結果を返す。`max` は 1 以上の整数。
+
+```bash
+curl "http://localhost:3000/api/truncate?text=hello&max=3"
+```
+
+レスポンス:
+
+```json
+{"text":"hello","truncated":"he…"}
+```
+
+`text` パラメータがない場合は `400` を返す。
+
+```bash
+curl http://localhost:3000/api/truncate
+```
+
+レスポンス:
+
+```json
+{"error":"text is required"}
+```
+
+`max` パラメータが 1 以上の整数でない場合も `400` を返す。
+
+```bash
+curl "http://localhost:3000/api/truncate?text=hello&max=abc"
+```
+
+レスポンス:
+
+```json
+{"error":"max must be a positive integer"}
+```
+
 未知のパスに対しては `404` を返す。`/api/` で始まるパスの場合は `{"error":"not found"}`（`content-type: application/json; charset=utf-8`）、それ以外のパスはテキストで返す。GET 以外の HTTP メソッドに対しては `405` を返す。
 
 ## 開発
