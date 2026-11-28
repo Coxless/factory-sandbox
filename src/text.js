@@ -25,6 +25,10 @@ export function normalizeSpaces(input) {
  * 行数を数える。\n と \r\n を改行として扱い、空文字列は 0、末尾の改行は数えない。
  * @param {string} input
  * @returns {number}
+ * @example
+ * countLines("a\nb\nc"); // => 3
+ * @example
+ * countLines("a\r\nb\n"); // => 2
  */
 export function countLines(input) {
   if (input === "") {
@@ -68,6 +72,10 @@ export function countWords(input) {
  * 書記素クラスター（見た目の1文字）単位で文字数を数える。
  * @param {string} input
  * @returns {number}
+ * @example
+ * countChars("日本語"); // => 3
+ * @example
+ * countChars("👨‍👩‍👧‍👦"); // => 1
  */
 export function countChars(input) {
   const segmenter = new Intl.Segmenter("ja", { granularity: "grapheme" });
