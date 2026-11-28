@@ -89,6 +89,12 @@ test("GET /api/words?text= は空文字列なので 400", async () => {
   assert.deepEqual(await res.json(), { error: "text is required" });
 });
 
+test("GET /api/words?text=a&text=b は複数指定なので 400", async () => {
+  const res = await request("/api/words?text=a&text=b", 400);
+  assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
+  assert.deepEqual(await res.json(), { error: "text must be given once" });
+});
+
 test("GET /api/words?text=hello%0Aworld は改行で lines: 2", async () => {
   const res = await request("/api/words?text=hello%0Aworld");
   assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");

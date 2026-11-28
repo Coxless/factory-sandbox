@@ -88,6 +88,18 @@ curl http://localhost:3000/api/words
 {"error": "text is required"}
 ```
 
+`text` パラメータを複数指定した場合も `400` を返す。
+
+```bash
+curl "http://localhost:3000/api/words?text=a&text=b"
+```
+
+レスポンス:
+
+```json
+{"error": "text must be given once"}
+```
+
 ### `GET /api/normalize?text=<文字列>`
 
 指定した文字列の前後の空白を取り除き、連続する空白を 1 つにまとめた結果を返す。

@@ -25,6 +25,7 @@ function getHealthz(req, res) {
  * GET /api/words のハンドラ。
  * 200: { text, words, lines }
  * 400: { error: "text is required" }
+ * 400: { error: "text must be given once" }
  * 413: { error: "text is too long" }
  * @param {IncomingMessage} req
  * @param {ServerResponse} res
@@ -32,7 +33,12 @@ function getHealthz(req, res) {
  * @returns {void}
  */
 function getApiWords(req, res, url) {
-  const text = url.searchParams.get("text");
+  const texts = url.searchParams.getAll("text");
+  if (texts.length >= 2) {
+    sendJson(res, 400, { error: "text must be given once" });
+    return;
+  }
+  const text = texts[0] ?? null;
   if (text === null || text === "") {
     sendJson(res, 400, { error: "text is required" });
     return;
@@ -162,7 +168,7 @@ function sendJson(res, status, body) {
  *
  * 登録されているルート:
  * - `GET /healthz` → 200 `{ status: "ok" }`（`HEAD` は本文なし）
- * - `GET /api/words?text=...` → 200 `{ text, words, lines }` または 400 `{ error: "text is required" }`
+ * - `GET /api/words?text=...` → 200 `{ text, words, lines }`、400 `{ error: "text is required" }`、400 `{ error: "text must be given once" }`、または 413 `{ error: "text is too long" }`
  * - `GET /api/normalize?text=...` → 200 `{ text, normalized }` または 400 `{ error: "text is required" }`
  * - `GET /api/stats?text=...` → 200 `{ words, chars, bytes }` または 400 `{ error: "text is required" }`
  * - `GET /` → 200 HTML
