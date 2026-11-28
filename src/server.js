@@ -1,6 +1,6 @@
 import { createServer } from "node:http";
 import { pathToFileURL } from "node:url";
-import { countWords } from "./text.js";
+import { countWords, normalizeSpaces } from "./text.js";
 
 /**
  * @typedef {import("node:http").IncomingMessage} IncomingMessage
@@ -37,6 +37,24 @@ function getApiWords(req, res, url) {
 }
 
 /**
+ * GET /api/normalize のハンドラ。
+ * @param {IncomingMessage} req
+ * @param {ServerResponse} res
+ * @param {URL} url
+ * @returns {void}
+ */
+function getApiNormalize(req, res, url) {
+  const text = url.searchParams.get("text");
+  if (text === null || text === "") {
+    res.writeHead(400, { "content-type": "application/json" });
+    res.end(JSON.stringify({ error: "text is required" }));
+    return;
+  }
+  res.writeHead(200, { "content-type": "application/json" });
+  res.end(JSON.stringify({ text, normalized: normalizeSpaces(text) }));
+}
+
+/**
  * GET / のハンドラ。
  * @param {IncomingMessage} _req
  * @param {ServerResponse} res
@@ -58,6 +76,7 @@ function getRoot(_req, res) {
 const routes = new Map([
   ["/healthz", getHealthz],
   ["/api/words", getApiWords],
+  ["/api/normalize", getApiNormalize],
   ["/", getRoot],
 ]);
 
