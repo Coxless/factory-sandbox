@@ -9,6 +9,7 @@ import { countWords, normalizeSpaces } from "./text.js";
 
 /**
  * GET /healthz のハンドラ。HEAD も同じヘッダーで本文なしで応答する。
+ * 200: { status: "ok" }（GET の場合。HEAD は本文なし）
  * @param {IncomingMessage} req
  * @param {ServerResponse} res
  * @returns {void}
@@ -19,6 +20,8 @@ function getHealthz(req, res) {
 
 /**
  * GET /api/words のハンドラ。
+ * 200: { text, words }
+ * 400: { error: "text is required" }
  * @param {IncomingMessage} req
  * @param {ServerResponse} res
  * @param {URL} url
@@ -35,6 +38,8 @@ function getApiWords(req, res, url) {
 
 /**
  * GET /api/normalize のハンドラ。
+ * 200: { text, normalized }
+ * 400: { error: "text is required" }
  * @param {IncomingMessage} req
  * @param {ServerResponse} res
  * @param {URL} url
@@ -51,6 +56,7 @@ function getApiNormalize(req, res, url) {
 
 /**
  * GET / のハンドラ。
+ * 200: HTML 本文
  * @param {IncomingMessage} _req
  * @param {ServerResponse} res
  * @returns {void}
@@ -126,6 +132,13 @@ function sendJson(res, status, body) {
 /**
  * ステージングで動くデモアプリの HTTP サーバーを作る（待ち受けは呼び出し側）。
  * `GET /healthz` は正常なら 200 を返す（ファクトリーのヘルスチェックが使う）。
+ *
+ * 登録されているルート:
+ * - `GET /healthz` → 200 `{ status: "ok" }`（`HEAD` は本文なし）
+ * - `GET /api/words?text=...` → 200 `{ text, words }` または 400 `{ error: "text is required" }`
+ * - `GET /api/normalize?text=...` → 200 `{ text, normalized }` または 400 `{ error: "text is required" }`
+ * - `GET /` → 200 HTML
+ *
  * @returns {import("node:http").Server}
  */
 export function createApp() {
