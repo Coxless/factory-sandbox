@@ -54,6 +54,7 @@ function getApiWords(req, res, url) {
  * GET /api/normalize のハンドラ。
  * 200: { text, normalized }
  * 400: { error: "text is required" }
+ * 413: { error: "text is too long" }
  * @param {IncomingMessage} req
  * @param {ServerResponse} res
  * @param {URL} url
@@ -65,6 +66,10 @@ function getApiNormalize(req, res, url) {
     sendJson(res, 400, { error: "text is required" });
     return;
   }
+  if (text.length > MAX_TEXT_LENGTH) {
+    sendJson(res, 413, { error: "text is too long" });
+    return;
+  }
   sendJson(res, 200, { text, normalized: normalizeSpaces(text) });
 }
 
@@ -72,6 +77,7 @@ function getApiNormalize(req, res, url) {
  * GET /api/stats のハンドラ。
  * 200: { words, chars, bytes }
  * 400: { error: "text is required" }
+ * 413: { error: "text is too long" }
  * @param {IncomingMessage} _req
  * @param {ServerResponse} res
  * @param {URL} url
@@ -81,6 +87,10 @@ function getApiStats(_req, res, url) {
   const text = url.searchParams.get("text");
   if (text === null || text === "") {
     sendJson(res, 400, { error: "text is required" });
+    return;
+  }
+  if (text.length > MAX_TEXT_LENGTH) {
+    sendJson(res, 413, { error: "text is too long" });
     return;
   }
   sendJson(res, 200, getStats(text));
@@ -185,8 +195,8 @@ function sendNotFound(req, res, pathname) {
  * 登録されているルート:
  * - `GET /healthz` → 200 `{ status: "ok" }`（`HEAD` は本文なし）
  * - `GET /api/words?text=...` → 200 `{ text, words, lines }`、400 `{ error: "text is required" }`、400 `{ error: "text must be given once" }`、または 413 `{ error: "text is too long" }`
- * - `GET /api/normalize?text=...` → 200 `{ text, normalized }` または 400 `{ error: "text is required" }`
- * - `GET /api/stats?text=...` → 200 `{ words, chars, bytes }` または 400 `{ error: "text is required" }`
+ * - `GET /api/normalize?text=...` → 200 `{ text, normalized }`、400 `{ error: "text is required" }`、または 413 `{ error: "text is too long" }`
+ * - `GET /api/stats?text=...` → 200 `{ words, chars, bytes }`、400 `{ error: "text is required" }`、または 413 `{ error: "text is too long" }`
  * - `GET /` → 200 HTML
  * - その他の `/api/` で始まるパス → 404 `{ error: "not found" }`（JSON）
  * - それ以外の未知のパス → 404 テキスト

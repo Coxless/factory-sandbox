@@ -126,6 +126,18 @@ curl http://localhost:3000/api/normalize
 {"error":"text is required"}
 ```
 
+`text` が 10000 文字を超える場合は `413` を返す。
+
+```bash
+curl "http://localhost:3000/api/normalize?text=$(python3 -c 'print("a"*10001)')"
+```
+
+レスポンス:
+
+```json
+{"error":"text is too long"}
+```
+
 ### `GET /api/stats?text=<文字列>`
 
 指定した文字列の単語数、文字数（コードポイント数）、UTF-8 バイト数を返す。
@@ -162,6 +174,18 @@ curl http://localhost:3000/api/stats
 
 ```json
 {"error":"text is required"}
+```
+
+`text` が 10000 文字を超える場合は `413` を返す。
+
+```bash
+curl "http://localhost:3000/api/stats?text=$(python3 -c 'print("a"*10001)')"
+```
+
+レスポンス:
+
+```json
+{"error":"text is too long"}
 ```
 
 未知のパスに対しては `404` を返す。`/api/` で始まるパスの場合は `{"error":"not found"}`（`content-type: application/json; charset=utf-8`）、それ以外のパスはテキストで返す。GET 以外の HTTP メソッドに対しては `405` を返す。

@@ -190,6 +190,20 @@ test("GET /api/words?text=<10001文字> は 413 を返す", async () => {
   assert.deepEqual(await res.json(), { error: "text is too long" });
 });
 
+test("GET /api/normalize?text=<10001文字> は 413 を返す", async () => {
+  const text = "a".repeat(10001);
+  const res = await request(`/api/normalize?text=${encodeURIComponent(text)}`, 413);
+  assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
+  assert.deepEqual(await res.json(), { error: "text is too long" });
+});
+
+test("GET /api/stats?text=<10001文字> は 413 を返す", async () => {
+  const text = "a".repeat(10001);
+  const res = await request(`/api/stats?text=${encodeURIComponent(text)}`, 413);
+  assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
+  assert.deepEqual(await res.json(), { error: "text is too long" });
+});
+
 test("登録されている全 GET ルートが 404 以外を返す", async () => {
   const routes = [
     "/",
