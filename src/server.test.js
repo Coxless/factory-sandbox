@@ -91,3 +91,17 @@ test("GET /api/normalize で text がないときは 400", async () => {
   assert.equal(res.headers.get("content-type"), "application/json");
   assert.deepEqual(await res.json(), { error: "text is required" });
 });
+
+test("GET /healthz/ は 200 と status: ok を返す", async () => {
+  const res = await request("/healthz/");
+  assert.deepEqual(await res.json(), { status: "ok" });
+});
+
+test("GET /api/words/?text=a は末尾スラッシュを無視して 200 を返す", async () => {
+  const res = await request("/api/words/?text=a");
+  assert.deepEqual(await res.json(), { text: "a", words: 1 });
+});
+
+test("GET /api/words// は 404", async () => {
+  await request("/api/words//", 404);
+});
