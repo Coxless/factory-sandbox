@@ -30,7 +30,7 @@ async function request(path, expectedStatus = 200, options) {
 
 test("/healthz は 200 と status: ok を返す", async () => {
   const res = await request("/healthz");
-  assert.equal(res.headers.get("content-type"), "application/json");
+  assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
   assert.deepEqual(await res.json(), { status: "ok" });
 });
 
@@ -46,7 +46,7 @@ test("知らないパスは 404", async () => {
 
 test("HEAD /healthz は 200 で本文なし", async () => {
   const res = await request("/healthz", 200, { method: "HEAD" });
-  assert.equal(res.headers.get("content-type"), "application/json");
+  assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
   assert.equal(await res.text(), "");
 });
 
@@ -67,49 +67,49 @@ test("DELETE /api/words は 405", async () => {
 
 test("GET /api/words?text=hello%20world は単語数と行数を返す", async () => {
   const res = await request("/api/words?text=hello%20world");
-  assert.equal(res.headers.get("content-type"), "application/json");
+  assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
   assert.deepEqual(await res.json(), { text: "hello world", words: 2, lines: 1 });
 });
 
 test("GET /api/words?text=日本語の全角スペース区切りも数える", async () => {
   const res = await request(`/api/words?text=${encodeURIComponent("こんにちは　世界")}`);
-  assert.equal(res.headers.get("content-type"), "application/json");
+  assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
   assert.deepEqual(await res.json(), { text: "こんにちは　世界", words: 2, lines: 1 });
 });
 
 test("GET /api/words で text がないときは 400", async () => {
   const res = await request("/api/words", 400);
-  assert.equal(res.headers.get("content-type"), "application/json");
+  assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
   assert.deepEqual(await res.json(), { error: "text is required" });
 });
 
 test("GET /api/words?text= は空文字列なので 400", async () => {
   const res = await request("/api/words?text=", 400);
-  assert.equal(res.headers.get("content-type"), "application/json");
+  assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
   assert.deepEqual(await res.json(), { error: "text is required" });
 });
 
 test("GET /api/words?text=hello%0Aworld は改行で lines: 2", async () => {
   const res = await request("/api/words?text=hello%0Aworld");
-  assert.equal(res.headers.get("content-type"), "application/json");
+  assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
   assert.deepEqual(await res.json(), { text: "hello\nworld", words: 2, lines: 2 });
 });
 
 test("GET /api/words?text=%20%20 は空白だけなので words: 0", async () => {
   const res = await request("/api/words?text=%20%20");
-  assert.equal(res.headers.get("content-type"), "application/json");
+  assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
   assert.deepEqual(await res.json(), { text: "  ", words: 0, lines: 1 });
 });
 
 test("GET /api/normalize?text=hello%20%20world は正規化結果を返す", async () => {
   const res = await request("/api/normalize?text=hello%20%20world");
-  assert.equal(res.headers.get("content-type"), "application/json");
+  assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
   assert.deepEqual(await res.json(), { text: "hello  world", normalized: "hello world" });
 });
 
 test("GET /api/normalize で text がないときは 400", async () => {
   const res = await request("/api/normalize", 400);
-  assert.equal(res.headers.get("content-type"), "application/json");
+  assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
   assert.deepEqual(await res.json(), { error: "text is required" });
 });
 
@@ -120,7 +120,7 @@ test("GET /healthz/ は 200 と status: ok を返す", async () => {
 
 test("GET /api/words/?text=a は末尾スラッシュを無視して 200 を返す", async () => {
   const res = await request("/api/words/?text=a");
-  assert.equal(res.headers.get("content-type"), "application/json");
+  assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
   assert.deepEqual(await res.json(), { text: "a", words: 1, lines: 1 });
 });
 
@@ -130,30 +130,30 @@ test("GET /api/words// は 404", async () => {
 
 test("GET /api/stats?text=hello%20world は統計を返す", async () => {
   const res = await request("/api/stats?text=hello%20world");
-  assert.equal(res.headers.get("content-type"), "application/json");
+  assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
   assert.deepEqual(await res.json(), { words: 2, chars: 11, bytes: 11 });
 });
 
 test("GET /api/stats?text=こんにちは は chars:5 bytes:15 を返す", async () => {
   const res = await request(`/api/stats?text=${encodeURIComponent("こんにちは")}`);
-  assert.equal(res.headers.get("content-type"), "application/json");
+  assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
   assert.deepEqual(await res.json(), { words: 1, chars: 5, bytes: 15 });
 });
 
 test("GET /api/stats で text がないときは 400", async () => {
   const res = await request("/api/stats", 400);
-  assert.equal(res.headers.get("content-type"), "application/json");
+  assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
   assert.deepEqual(await res.json(), { error: "text is required" });
 });
 
 test("GET /api/stats?text= は空文字列なので 400", async () => {
   const res = await request("/api/stats?text=", 400);
-  assert.equal(res.headers.get("content-type"), "application/json");
+  assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
   assert.deepEqual(await res.json(), { error: "text is required" });
 });
 
 test("GET /api/stats/ は末尾スラッシュを無視して 200 を返す", async () => {
   const res = await request("/api/stats/?text=hello");
-  assert.equal(res.headers.get("content-type"), "application/json");
+  assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
   assert.deepEqual(await res.json(), { words: 1, chars: 5, bytes: 5 });
 });
