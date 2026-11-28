@@ -12,6 +12,10 @@ const LETTER_OR_NUMBER = /[\p{L}\p{N}]/u;
  * 文字列の前後の空白を取り、連続する空白を1つにまとめる。
  * @param {string} input
  * @returns {string}
+ * @example
+ * normalizeSpaces("  a   b\tc \n"); // => "a b c"
+ * @example
+ * normalizeSpaces("a　　b"); // => "a b"
  */
 export function normalizeSpaces(input) {
   return input.trim().replace(WHITESPACE_RUN, " ");
@@ -37,6 +41,10 @@ export function countLines(input) {
  * 単語の数を数える（空白区切り）。
  * @param {string} input
  * @returns {number}
+ * @example
+ * countWords("hello  world"); // => 2
+ * @example
+ * countWords("a 、 b"); // => 2
  */
 export function countWords(input) {
   const normalized = normalizeSpaces(input);
