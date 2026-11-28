@@ -76,13 +76,13 @@ export function countChars(input) {
 
 /**
  * テキスト統計を返す。
- * 単語数は記号だけの語を除く空白区切りの非空トークン数、文字数はコードポイント数、バイト数は UTF-8 のバイト数。
+ * 単語数は記号だけの語を除く空白区切りの非空トークン数、文字数は書記素クラスター数、バイト数は UTF-8 のバイト数。
  * @param {string} input
  * @returns {{ words: number, chars: number, bytes: number }}
  */
 export function getStats(input) {
   const words = countWords(input);
-  const chars = [...input].length;
+  const chars = countChars(input);
   const bytes = Buffer.byteLength(input, "utf8");
   return { words, chars, bytes };
 }

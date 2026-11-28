@@ -152,7 +152,7 @@ curl "http://localhost:3000/api/normalize?text=$(python3 -c 'print("a"*10001)')"
 
 ### `GET /api/stats?text=<文字列>`
 
-指定した文字列の単語数、文字数（コードポイント数）、UTF-8 バイト数を返す。
+指定した文字列の単語数、文字数（書記素クラスター数）、UTF-8 バイト数を返す。
 
 ```bash
 curl "http://localhost:3000/api/stats?text=hello%20world"

@@ -165,8 +165,12 @@ test("getStats は日本語の文字数と UTF-8 バイト数を返す", () => {
   assert.deepEqual(getStats("こんにちは"), { words: 1, chars: 5, bytes: 15 });
 });
 
-test("getStats は絵文字をコードポイント単位で数える", () => {
+test("getStats は絵文字を書記素クラスター単位で数える", () => {
   assert.deepEqual(getStats("🎉🎊"), { words: 0, chars: 2, bytes: 8 });
+});
+
+test("getStats は家族絵文字を 1 文字と数える", () => {
+  assert.deepEqual(getStats("👨‍👩‍👧"), { words: 0, chars: 1, bytes: 18 });
 });
 
 test("getStats は前後の空白を無視して単語を数える", () => {
