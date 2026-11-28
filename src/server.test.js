@@ -127,6 +127,12 @@ test("GET /api/normalize で text がないときは 400", async () => {
   assert.deepEqual(await res.json(), { error: "text is required" });
 });
 
+test("GET /api/normalize?text=a&text=b は複数指定なので 400", async () => {
+  const res = await request("/api/normalize?text=a&text=b", 400);
+  assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
+  assert.deepEqual(await res.json(), { error: "text must be given once" });
+});
+
 test("GET /healthz/ は 200 と status: ok を返す", async () => {
   const res = await request("/healthz/");
   assert.deepEqual(await res.json(), { status: "ok" });
@@ -164,6 +170,12 @@ test("GET /api/stats?text= は空文字列なので 400", async () => {
   const res = await request("/api/stats?text=", 400);
   assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
   assert.deepEqual(await res.json(), { error: "text is required" });
+});
+
+test("GET /api/stats?text=a&text=b は複数指定なので 400", async () => {
+  const res = await request("/api/stats?text=a&text=b", 400);
+  assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
+  assert.deepEqual(await res.json(), { error: "text must be given once" });
 });
 
 test("GET /api/stats/ は末尾スラッシュを無視して 200 を返す", async () => {

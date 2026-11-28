@@ -126,6 +126,18 @@ curl http://localhost:3000/api/normalize
 {"error":"text is required"}
 ```
 
+`text` パラメータを複数指定した場合も `400` を返す。
+
+```bash
+curl "http://localhost:3000/api/normalize?text=a&text=b"
+```
+
+レスポンス:
+
+```json
+{"error":"text must be given once"}
+```
+
 `text` が 10000 文字を超える場合は `413` を返す。
 
 ```bash
@@ -174,6 +186,18 @@ curl http://localhost:3000/api/stats
 
 ```json
 {"error":"text is required"}
+```
+
+`text` パラメータを複数指定した場合も `400` を返す。
+
+```bash
+curl "http://localhost:3000/api/stats?text=a&text=b"
+```
+
+レスポンス:
+
+```json
+{"error":"text must be given once"}
 ```
 
 `text` が 10000 文字を超える場合は `413` を返す。
