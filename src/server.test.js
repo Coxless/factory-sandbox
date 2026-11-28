@@ -79,3 +79,15 @@ test("GET /api/words?text=%20%20 は空白だけなので words: 0", async () =>
   assert.equal(res.headers.get("content-type"), "application/json");
   assert.deepEqual(await res.json(), { text: "  ", words: 0 });
 });
+
+test("GET /api/normalize?text=hello%20%20world は正規化結果を返す", async () => {
+  const res = await request("/api/normalize?text=hello%20%20world");
+  assert.equal(res.headers.get("content-type"), "application/json");
+  assert.deepEqual(await res.json(), { text: "hello  world", normalized: "hello world" });
+});
+
+test("GET /api/normalize で text がないときは 400", async () => {
+  const res = await request("/api/normalize", 400);
+  assert.equal(res.headers.get("content-type"), "application/json");
+  assert.deepEqual(await res.json(), { error: "text is required" });
+});

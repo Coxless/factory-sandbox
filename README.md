@@ -88,4 +88,30 @@ curl http://localhost:3000/api/words
 {"error": "text is required"}
 ```
 
+### `GET /api/normalize?text=<文字列>`
+
+指定した文字列の前後の空白を取り除き、連続する空白を 1 つにまとめた結果を返す。
+
+```bash
+curl "http://localhost:3000/api/normalize?text=hello++world"
+```
+
+レスポンス:
+
+```json
+{"text": "hello  world", "normalized": "hello world"}
+```
+
+`text` パラメータがない場合は `400` を返す。
+
+```bash
+curl http://localhost:3000/api/normalize
+```
+
+レスポンス:
+
+```json
+{"error": "text is required"}
+```
+
 未知のパスに対しては `404`、GET 以外の HTTP メソッドに対しては `405` を返す。
