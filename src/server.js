@@ -1,6 +1,6 @@
 import { createServer } from "node:http";
 import { pathToFileURL } from "node:url";
-import { countWords, normalizeSpaces } from "./text.js";
+import { countLines, countWords, normalizeSpaces } from "./text.js";
 
 /**
  * @typedef {import("node:http").IncomingMessage} IncomingMessage
@@ -20,7 +20,7 @@ function getHealthz(req, res) {
 
 /**
  * GET /api/words のハンドラ。
- * 200: { text, words }
+ * 200: { text, words, lines }
  * 400: { error: "text is required" }
  * @param {IncomingMessage} req
  * @param {ServerResponse} res
@@ -33,7 +33,7 @@ function getApiWords(req, res, url) {
     sendJson(res, 400, { error: "text is required" });
     return;
   }
-  sendJson(res, 200, { text, words: countWords(text) });
+  sendJson(res, 200, { text, words: countWords(text), lines: countLines(text) });
 }
 
 /**
@@ -135,7 +135,7 @@ function sendJson(res, status, body) {
  *
  * 登録されているルート:
  * - `GET /healthz` → 200 `{ status: "ok" }`（`HEAD` は本文なし）
- * - `GET /api/words?text=...` → 200 `{ text, words }` または 400 `{ error: "text is required" }`
+ * - `GET /api/words?text=...` → 200 `{ text, words, lines }` または 400 `{ error: "text is required" }`
  * - `GET /api/normalize?text=...` → 200 `{ text, normalized }` または 400 `{ error: "text is required" }`
  * - `GET /` → 200 HTML
  *

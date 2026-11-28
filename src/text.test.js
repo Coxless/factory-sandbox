@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { countChars, countWords, normalizeSpaces, truncate } from "./text.js";
+import { countChars, countLines, countWords, normalizeSpaces, truncate } from "./text.js";
 
 test("normalizeSpaces は前後の空白を取り、連続する空白を1つにする", () => {
   assert.equal(normalizeSpaces("  a   b\tc \n"), "a b c");
@@ -109,4 +109,38 @@ test("countChars は結合文字を含む入力も 1 文字と数える", () => 
 
 test("countChars は空文字列を 0 と返す", () => {
   assert.equal(countChars(""), 0);
+});
+
+test("countLines は空文字列を 0 と返す", () => {
+  assert.equal(countLines(""), 0);
+});
+
+test("countLines は改行なしの文字列を 1 行と数える", () => {
+  assert.equal(countLines("hello"), 1);
+});
+
+test("countLines は末尾の改行を数えない", () => {
+  assert.equal(countLines("hello\n"), 1);
+  assert.equal(countLines("hello\r\n"), 1);
+});
+
+test("countLines は \\n で区切った行数を返す", () => {
+  assert.equal(countLines("hello\nworld"), 2);
+  assert.equal(countLines("a\nb\nc"), 3);
+});
+
+test("countLines は \\r\\n で区切った行数を返す", () => {
+  assert.equal(countLines("hello\r\nworld"), 2);
+  assert.equal(countLines("a\r\nb\r\nc"), 3);
+});
+
+test("countLines は空行を行として数える", () => {
+  assert.equal(countLines("a\n\n"), 2);
+  assert.equal(countLines("a\r\n\r\n"), 2);
+  assert.equal(countLines("\n"), 1);
+  assert.equal(countLines("\r\n"), 1);
+});
+
+test("countLines は混在する改行を区切りとして扱う", () => {
+  assert.equal(countLines("a\r\nb\nc"), 3);
 });

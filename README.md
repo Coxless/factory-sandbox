@@ -64,7 +64,7 @@ curl http://localhost:3000/healthz
 
 ### `GET /api/words?text=<文字列>`
 
-指定した文字列に含まれる単語の数を返す。
+指定した文字列に含まれる単語数と行数を返す。
 
 ```bash
 curl "http://localhost:3000/api/words?text=hello+world"
@@ -73,7 +73,7 @@ curl "http://localhost:3000/api/words?text=hello+world"
 レスポンス:
 
 ```json
-{"text": "hello world", "words": 2}
+{"text": "hello world", "words": 2, "lines": 1}
 ```
 
 `text` パラメータがない場合は `400` を返す。

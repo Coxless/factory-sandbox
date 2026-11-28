@@ -8,6 +8,22 @@ export function normalizeSpaces(input) {
 }
 
 /**
+ * 行数を数える。\n と \r\n を改行として扱い、空文字列は 0、末尾の改行は数えない。
+ * @param {string} input
+ * @returns {number}
+ */
+export function countLines(input) {
+  if (input === "") {
+    return 0;
+  }
+  const lines = input.split(/\r?\n/);
+  if (lines[lines.length - 1] === "") {
+    lines.pop();
+  }
+  return lines.length;
+}
+
+/**
  * 単語の数を数える（空白区切り）。
  * @param {string} input
  * @returns {number}
