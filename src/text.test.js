@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { countChars, countLines, countWords, normalizeSpaces, truncate } from "./text.js";
+import { countChars, countLines, countWords, getStats, normalizeSpaces, truncate } from "./text.js";
 
 test("normalizeSpaces は前後の空白を取り、連続する空白を1つにする", () => {
   assert.equal(normalizeSpaces("  a   b\tc \n"), "a b c");
@@ -143,4 +143,24 @@ test("countLines は空行を行として数える", () => {
 
 test("countLines は混在する改行を区切りとして扱う", () => {
   assert.equal(countLines("a\r\nb\nc"), 3);
+});
+
+test("getStats は空文字列をすべて 0 で返す", () => {
+  assert.deepEqual(getStats(""), { words: 0, chars: 0, bytes: 0 });
+});
+
+test("getStats は空白区切りの英単語を数える", () => {
+  assert.deepEqual(getStats("hello  world"), { words: 2, chars: 12, bytes: 12 });
+});
+
+test("getStats は日本語の文字数と UTF-8 バイト数を返す", () => {
+  assert.deepEqual(getStats("こんにちは"), { words: 1, chars: 5, bytes: 15 });
+});
+
+test("getStats は絵文字をコードポイント単位で数える", () => {
+  assert.deepEqual(getStats("🎉🎊"), { words: 1, chars: 2, bytes: 8 });
+});
+
+test("getStats は前後の空白を無視して単語を数える", () => {
+  assert.deepEqual(getStats("  a b c  "), { words: 3, chars: 9, bytes: 9 });
 });

@@ -1,6 +1,6 @@
 import { createServer } from "node:http";
 import { pathToFileURL } from "node:url";
-import { countLines, countWords, normalizeSpaces } from "./text.js";
+import { countLines, countWords, getStats, normalizeSpaces } from "./text.js";
 
 /**
  * @typedef {import("node:http").IncomingMessage} IncomingMessage
@@ -55,6 +55,24 @@ function getApiNormalize(req, res, url) {
 }
 
 /**
+ * GET /api/stats のハンドラ。
+ * 200: { words, chars, bytes }
+ * 400: { error: "text is required" }
+ * @param {IncomingMessage} _req
+ * @param {ServerResponse} res
+ * @param {URL} url
+ * @returns {void}
+ */
+function getApiStats(_req, res, url) {
+  const text = url.searchParams.get("text");
+  if (text === null || text === "") {
+    sendJson(res, 400, { error: "text is required" });
+    return;
+  }
+  sendJson(res, 200, getStats(text));
+}
+
+/**
  * GET / のハンドラ。
  * 200: HTML 本文
  * @param {IncomingMessage} _req
@@ -78,6 +96,7 @@ const routes = new Map([
   ["/healthz", getHealthz],
   ["/api/words", getApiWords],
   ["/api/normalize", getApiNormalize],
+  ["/api/stats", getApiStats],
   ["/", getRoot],
 ]);
 
@@ -137,6 +156,7 @@ function sendJson(res, status, body) {
  * - `GET /healthz` → 200 `{ status: "ok" }`（`HEAD` は本文なし）
  * - `GET /api/words?text=...` → 200 `{ text, words, lines }` または 400 `{ error: "text is required" }`
  * - `GET /api/normalize?text=...` → 200 `{ text, normalized }` または 400 `{ error: "text is required" }`
+ * - `GET /api/stats?text=...` → 200 `{ words, chars, bytes }` または 400 `{ error: "text is required" }`
  * - `GET /` → 200 HTML
  *
  * @returns {import("node:http").Server}

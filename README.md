@@ -114,6 +114,44 @@ curl http://localhost:3000/api/normalize
 {"error": "text is required"}
 ```
 
+### `GET /api/stats?text=<文字列>`
+
+指定した文字列の単語数、文字数（コードポイント数）、UTF-8 バイト数を返す。
+
+```bash
+curl "http://localhost:3000/api/stats?text=hello+world"
+```
+
+レスポンス:
+
+```json
+{"words": 2, "chars": 11, "bytes": 11}
+```
+
+日本語や絵文字も文字数と UTF-8 バイト数を区別して返す。
+
+```bash
+curl "http://localhost:3000/api/stats?text=%E3%81%93%E3%82%93%E3%81%AB%E3%81%A1%E3%81%AF"
+```
+
+レスポンス:
+
+```json
+{"words": 1, "chars": 5, "bytes": 15}
+```
+
+`text` パラメータがない場合は `400` を返す。
+
+```bash
+curl http://localhost:3000/api/stats
+```
+
+レスポンス:
+
+```json
+{"error": "text is required"}
+```
+
 未知のパスに対しては `404`、GET 以外の HTTP メソッドに対しては `405` を返す。
 
 ## 開発
