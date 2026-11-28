@@ -62,6 +62,14 @@ test("countWords は記号だけの語を数えない", () => {
   assert.equal(countWords("- - -"), 0);
 });
 
+test("countWords は数字を含む語を数える", () => {
+  assert.equal(countWords("2026 年 11 月"), 4);
+});
+
+test("countWords は英字と日本語の混在を数える", () => {
+  assert.equal(countWords("Node.js と pnpm"), 3);
+});
+
 test("truncate は短い文字列をそのまま返す", () => {
   assert.equal(truncate("hello", 10), "hello");
 });
