@@ -1,10 +1,20 @@
 /**
+ * 1 つ以上の連続した空白文字に一致する。
+ */
+const WHITESPACE_RUN = /\s+/g;
+
+/**
+ * 1 文字以上の文字または数字に一致する（Unicode の書記素カテゴリを使用）。
+ */
+const LETTER_OR_NUMBER = /[\p{L}\p{N}]/u;
+
+/**
  * 文字列の前後の空白を取り、連続する空白を1つにまとめる。
  * @param {string} input
  * @returns {string}
  */
 export function normalizeSpaces(input) {
-  return input.trim().replace(/\s+/g, " ");
+  return input.trim().replace(WHITESPACE_RUN, " ");
 }
 
 /**
@@ -17,7 +27,7 @@ export function countWords(input) {
   if (normalized === "") {
     return 0;
   }
-  return normalized.split(" ").filter((token) => /[\p{L}\p{N}]/u.test(token)).length;
+  return normalized.split(" ").filter((token) => LETTER_OR_NUMBER.test(token)).length;
 }
 
 /**
