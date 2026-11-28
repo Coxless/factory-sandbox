@@ -73,16 +73,16 @@ test("DELETE /api/words は 405", async () => {
   await request("/api/words", 405, { method: "DELETE" });
 });
 
-test("GET /api/words?text=hello%20world は単語数と行数を返す", async () => {
+test("GET /api/words?text=hello%20world は単語数と行数と文字数を返す", async () => {
   const res = await request("/api/words?text=hello%20world");
   assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
-  assert.deepEqual(await res.json(), { text: "hello world", words: 2, lines: 1 });
+  assert.deepEqual(await res.json(), { text: "hello world", words: 2, lines: 1, chars: 11 });
 });
 
 test("GET /api/words?text=日本語の全角スペース区切りも数える", async () => {
   const res = await request(`/api/words?text=${encodeURIComponent("こんにちは　世界")}`);
   assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
-  assert.deepEqual(await res.json(), { text: "こんにちは　世界", words: 2, lines: 1 });
+  assert.deepEqual(await res.json(), { text: "こんにちは　世界", words: 2, lines: 1, chars: 8 });
 });
 
 test("GET /api/words で text がないときは 400", async () => {
@@ -106,13 +106,13 @@ test("GET /api/words?text=a&text=b は複数指定なので 400", async () => {
 test("GET /api/words?text=hello%0Aworld は改行で lines: 2", async () => {
   const res = await request("/api/words?text=hello%0Aworld");
   assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
-  assert.deepEqual(await res.json(), { text: "hello\nworld", words: 2, lines: 2 });
+  assert.deepEqual(await res.json(), { text: "hello\nworld", words: 2, lines: 2, chars: 11 });
 });
 
 test("GET /api/words?text=%20%20 は空白だけなので words: 0", async () => {
   const res = await request("/api/words?text=%20%20");
   assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
-  assert.deepEqual(await res.json(), { text: "  ", words: 0, lines: 1 });
+  assert.deepEqual(await res.json(), { text: "  ", words: 0, lines: 1, chars: 2 });
 });
 
 test("GET /api/normalize?text=hello%20%20world は正規化結果を返す", async () => {
@@ -141,7 +141,7 @@ test("GET /healthz/ は 200 と status: ok を返す", async () => {
 test("GET /api/words/?text=a は末尾スラッシュを無視して 200 を返す", async () => {
   const res = await request("/api/words/?text=a");
   assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
-  assert.deepEqual(await res.json(), { text: "a", words: 1, lines: 1 });
+  assert.deepEqual(await res.json(), { text: "a", words: 1, lines: 1, chars: 1 });
 });
 
 test("GET /api/words// は 404", async () => {
@@ -247,6 +247,7 @@ test("GET /api/words?text=<10000文字> は 200 を返す", async () => {
   assert.equal(body.text.length, 10000);
   assert.equal(body.words, 1);
   assert.equal(body.lines, 1);
+  assert.equal(body.chars, 10000);
 });
 
 test("GET /api/words?text=<10001文字> は 413 を返す", async () => {

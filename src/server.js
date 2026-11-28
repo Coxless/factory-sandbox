@@ -1,6 +1,6 @@
 import { createServer } from "node:http";
 import { pathToFileURL } from "node:url";
-import { countLines, countWords, getStats, normalizeSpaces, truncate } from "./text.js";
+import { countChars, countLines, countWords, getStats, normalizeSpaces, truncate } from "./text.js";
 
 /**
  * @typedef {import("node:http").IncomingMessage} IncomingMessage
@@ -23,7 +23,7 @@ function getHealthz(req, res) {
 
 /**
  * GET /api/words のハンドラ。
- * 200: { text, words, lines }
+ * 200: { text, words, lines, chars }
  * 400: { error: "text is required" }
  * 400: { error: "text must be given once" }
  * 413: { error: "text is too long" }
@@ -47,7 +47,7 @@ function getApiWords(req, res, url) {
     sendJson(res, 413, { error: "text is too long" });
     return;
   }
-  sendJson(res, 200, { text, words: countWords(text), lines: countLines(text) });
+  sendJson(res, 200, { text, words: countWords(text), lines: countLines(text), chars: countChars(text) });
 }
 
 /**
@@ -232,7 +232,7 @@ function sendNotFound(req, res, pathname) {
  *
  * 登録されているルート:
  * - `GET /healthz` → 200 `{ status: "ok" }`（`HEAD` は本文なし）
- * - `GET /api/words?text=...` → 200 `{ text, words, lines }`、400 `{ error: "text is required" }`、400 `{ error: "text must be given once" }`、または 413 `{ error: "text is too long" }`
+ * - `GET /api/words?text=...` → 200 `{ text, words, lines, chars }`、400 `{ error: "text is required" }`、400 `{ error: "text must be given once" }`、または 413 `{ error: "text is too long" }`
  * - `GET /api/normalize?text=...` → 200 `{ text, normalized }`、400 `{ error: "text is required" }`、400 `{ error: "text must be given once" }`、または 413 `{ error: "text is too long" }`
  * - `GET /api/stats?text=...` → 200 `{ words, chars, bytes }`、400 `{ error: "text is required" }`、400 `{ error: "text must be given once" }`、または 413 `{ error: "text is too long" }`
  * - `GET /api/truncate?text=...&max=...` → 200 `{ text, truncated }`、400 `{ error: "text is required" }`、または 400 `{ error: "max must be a positive integer" }`
