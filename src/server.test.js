@@ -30,11 +30,13 @@ async function request(path, expectedStatus = 200, options) {
 
 test("/healthz は 200 と status: ok を返す", async () => {
   const res = await request("/healthz");
+  assert.equal(res.headers.get("content-type"), "application/json");
   assert.deepEqual(await res.json(), { status: "ok" });
 });
 
 test("/ は HTML を返す", async () => {
   const res = await request("/");
+  assert.equal(res.headers.get("content-type"), "text/html; charset=utf-8");
   assert.match(await res.text(), /factory-sandbox/);
 });
 
@@ -71,6 +73,7 @@ test("GET /api/words?text=hello%20world は単語数を返す", async () => {
 
 test("GET /api/words?text=日本語の全角スペース区切りも数える", async () => {
   const res = await request(`/api/words?text=${encodeURIComponent("こんにちは　世界")}`);
+  assert.equal(res.headers.get("content-type"), "application/json");
   assert.deepEqual(await res.json(), { text: "こんにちは　世界", words: 2 });
 });
 
@@ -111,6 +114,7 @@ test("GET /healthz/ は 200 と status: ok を返す", async () => {
 
 test("GET /api/words/?text=a は末尾スラッシュを無視して 200 を返す", async () => {
   const res = await request("/api/words/?text=a");
+  assert.equal(res.headers.get("content-type"), "application/json");
   assert.deepEqual(await res.json(), { text: "a", words: 1 });
 });
 
