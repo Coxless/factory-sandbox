@@ -157,3 +157,21 @@ test("GET /api/stats/ は末尾スラッシュを無視して 200 を返す", as
   assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
   assert.deepEqual(await res.json(), { words: 1, chars: 5, bytes: 5 });
 });
+
+test("GET /api/words?text=<10000文字> は 200 を返す", async () => {
+  const text = "a".repeat(10000);
+  const res = await request(`/api/words?text=${encodeURIComponent(text)}`);
+  assert.equal(res.status, 200);
+  assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
+  const body = await res.json();
+  assert.equal(body.text.length, 10000);
+  assert.equal(body.words, 1);
+  assert.equal(body.lines, 1);
+});
+
+test("GET /api/words?text=<10001文字> は 413 を返す", async () => {
+  const text = "a".repeat(10001);
+  const res = await request(`/api/words?text=${encodeURIComponent(text)}`, 413);
+  assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
+  assert.deepEqual(await res.json(), { error: "text is too long" });
+});

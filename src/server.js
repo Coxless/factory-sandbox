@@ -7,6 +7,9 @@ import { countLines, countWords, getStats, normalizeSpaces } from "./text.js";
  * @typedef {import("node:http").ServerResponse} ServerResponse
  */
 
+/** /api/words で受け付ける text の最大長（文字数）。 */
+const MAX_TEXT_LENGTH = 10000;
+
 /**
  * GET /healthz のハンドラ。HEAD も同じヘッダーで本文なしで応答する。
  * 200: { status: "ok" }（GET の場合。HEAD は本文なし）
@@ -22,6 +25,7 @@ function getHealthz(req, res) {
  * GET /api/words のハンドラ。
  * 200: { text, words, lines }
  * 400: { error: "text is required" }
+ * 413: { error: "text is too long" }
  * @param {IncomingMessage} req
  * @param {ServerResponse} res
  * @param {URL} url
@@ -31,6 +35,10 @@ function getApiWords(req, res, url) {
   const text = url.searchParams.get("text");
   if (text === null || text === "") {
     sendJson(res, 400, { error: "text is required" });
+    return;
+  }
+  if (text.length > MAX_TEXT_LENGTH) {
+    sendJson(res, 413, { error: "text is too long" });
     return;
   }
   sendJson(res, 200, { text, words: countWords(text), lines: countLines(text) });
