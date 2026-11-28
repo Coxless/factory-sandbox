@@ -184,6 +184,60 @@ test("GET /api/stats/ は末尾スラッシュを無視して 200 を返す", as
   assert.deepEqual(await res.json(), { words: 1, chars: 5, bytes: 5 });
 });
 
+test("GET /api/truncate?text=hello&max=3 は切り詰め結果を返す", async () => {
+  const res = await request("/api/truncate?text=hello&max=3");
+  assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
+  assert.deepEqual(await res.json(), { text: "hello", truncated: "he…" });
+});
+
+test("GET /api/truncate?text=hello&max=100 は切り詰めない", async () => {
+  const res = await request("/api/truncate?text=hello&max=100");
+  assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
+  assert.deepEqual(await res.json(), { text: "hello", truncated: "hello" });
+});
+
+test("GET /api/truncate で text がないときは 400", async () => {
+  const res = await request("/api/truncate", 400);
+  assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
+  assert.deepEqual(await res.json(), { error: "text is required" });
+});
+
+test("GET /api/truncate?text= は空文字列なので 400", async () => {
+  const res = await request("/api/truncate?text=", 400);
+  assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
+  assert.deepEqual(await res.json(), { error: "text is required" });
+});
+
+test("GET /api/truncate?text=hello で max がないときは 400", async () => {
+  const res = await request("/api/truncate?text=hello", 400);
+  assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
+  assert.deepEqual(await res.json(), { error: "max must be a positive integer" });
+});
+
+test("GET /api/truncate?text=hello&max=abc は整数でないので 400", async () => {
+  const res = await request("/api/truncate?text=hello&max=abc", 400);
+  assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
+  assert.deepEqual(await res.json(), { error: "max must be a positive integer" });
+});
+
+test("GET /api/truncate?text=hello&max=0 は 1 未満なので 400", async () => {
+  const res = await request("/api/truncate?text=hello&max=0", 400);
+  assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
+  assert.deepEqual(await res.json(), { error: "max must be a positive integer" });
+});
+
+test("GET /api/truncate?text=hello&max=-1 は負の数なので 400", async () => {
+  const res = await request("/api/truncate?text=hello&max=-1", 400);
+  assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
+  assert.deepEqual(await res.json(), { error: "max must be a positive integer" });
+});
+
+test("GET /api/truncate?text=hello&max=1.5 は整数でないので 400", async () => {
+  const res = await request("/api/truncate?text=hello&max=1.5", 400);
+  assert.equal(res.headers.get("content-type"), "application/json; charset=utf-8");
+  assert.deepEqual(await res.json(), { error: "max must be a positive integer" });
+});
+
 test("GET /api/words?text=<10000文字> は 200 を返す", async () => {
   const text = "a".repeat(10000);
   const res = await request(`/api/words?text=${encodeURIComponent(text)}`);
@@ -223,6 +277,7 @@ test("登録されている全 GET ルートが 404 以外を返す", async () =
     "/api/words?text=a",
     "/api/normalize?text=a",
     "/api/stats?text=a",
+    "/api/truncate?text=a&max=1",
   ];
   for (const path of routes) {
     const res = await fetch(`${base}${path}`);
