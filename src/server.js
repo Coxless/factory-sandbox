@@ -8,14 +8,14 @@ import { countWords, normalizeSpaces } from "./text.js";
  */
 
 /**
- * GET /healthz のハンドラ。
- * @param {IncomingMessage} _req
+ * GET /healthz のハンドラ。HEAD も同じヘッダーで本文なしで応答する。
+ * @param {IncomingMessage} req
  * @param {ServerResponse} res
  * @returns {void}
  */
-function getHealthz(_req, res) {
+function getHealthz(req, res) {
   res.writeHead(200, { "content-type": "application/json" });
-  res.end(JSON.stringify({ status: "ok" }));
+  res.end(req.method === "HEAD" ? undefined : JSON.stringify({ status: "ok" }));
 }
 
 /**
@@ -102,14 +102,32 @@ function normalizePathname(pathname) {
 }
 
 /**
+ * ステータスコードとヘッダーを設定してレスポンスを終了する。
+ * HEAD リクエストの場合は本文を返さない。
+ * @param {IncomingMessage} req
+ * @param {ServerResponse} res
+ * @param {number} statusCode
+ * @param {import("node:http").OutgoingHttpHeaders} headers
+ * @param {string} body
+ * @returns {void}
+ */
+function respond(req, res, statusCode, headers, body) {
+  res.writeHead(statusCode, headers);
+  res.end(req.method === "HEAD" ? undefined : body);
+}
+
+/**
  * ステージングで動くデモアプリの HTTP サーバーを作る（待ち受けは呼び出し側）。
  * `GET /healthz` は正常なら 200 を返す（ファクトリーのヘルスチェックが使う）。
  * @returns {import("node:http").Server}
  */
 export function createApp() {
   return createServer((req, res) => {
-    if (req.method !== "GET") {
-      res.writeHead(405, { "content-type": "text/plain; charset=utf-8" });
+    if (req.method !== "GET" && req.method !== "HEAD") {
+      res.writeHead(405, {
+        "content-type": "text/plain; charset=utf-8",
+        allow: "GET, HEAD",
+      });
       res.end("method not allowed\n");
       return;
     }
@@ -118,8 +136,7 @@ export function createApp() {
     const pathname = normalizePathname(url.pathname);
 
     if (pathname === null) {
-      res.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
-      res.end("not found\n");
+      respond(req, res, 404, { "content-type": "text/plain; charset=utf-8" }, "not found\n");
       return;
     }
 
@@ -130,8 +147,7 @@ export function createApp() {
       return;
     }
 
-    res.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
-    res.end("not found\n");
+    respond(req, res, 404, { "content-type": "text/plain; charset=utf-8" }, "not found\n");
   });
 }
 

@@ -42,9 +42,21 @@ test("知らないパスは 404", async () => {
   await request("/nope", 404);
 });
 
+test("HEAD /healthz は 200 で本文なし", async () => {
+  const res = await request("/healthz", 200, { method: "HEAD" });
+  assert.equal(res.headers.get("content-type"), "application/json");
+  assert.equal(await res.text(), "");
+});
+
+test("HEAD /nope は 404 で本文なし", async () => {
+  const res = await request("/nope", 404, { method: "HEAD" });
+  assert.equal(await res.text(), "");
+});
+
 test("POST /healthz は 405 method not allowed", async () => {
   const res = await request("/healthz", 405, { method: "POST" });
   assert.equal(await res.text(), "method not allowed\n");
+  assert.equal(res.headers.get("allow"), "GET, HEAD");
 });
 
 test("DELETE /api/words は 405", async () => {
